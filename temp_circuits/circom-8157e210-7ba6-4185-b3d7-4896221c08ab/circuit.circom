@@ -1,0 +1,1 @@
+template Hello() { signal input a; signal output b; b <== a + 2; } component main = Hello();

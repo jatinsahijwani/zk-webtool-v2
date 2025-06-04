@@ -9,16 +9,23 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "circom_tester": "^0.0.23",
+    "fs-extra": "^11.3.0",
+    "next": "15.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.3.3"
+    "snarkjs": "^0.7.5",
+    "solc": "^0.8.30",
+    "uuid": "^11.1.0",
+    "web3": "^4.16.0"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@tailwindcss/postcss": "^4",
+    "@types/fs-extra": "^11.0.4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4"
+    "tailwindcss": "^4",
+    "typescript": "^5"
   }
 }
