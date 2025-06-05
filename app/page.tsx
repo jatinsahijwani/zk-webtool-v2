@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Web3 from "web3";
 
 export default function Home() {
   const [circuitCode, setCircuitCode] = useState("");
@@ -13,16 +12,15 @@ export default function Home() {
     verifier?: string;
   }>({});
   const [contractAddress, setContractAddress] = useState<string | null>(null);
+  const [verifierSol, setVerifierSol] = useState<string>(""); // store verifier.sol code
 
-  const [abi, setAbi] = useState<any>(null);
-  const [bytecode, setBytecode] = useState<string>("");
+  // Remove abi and bytecode since deploy will be via backend now
 
   const handleCompile = async () => {
     setCompiling(true);
     setDownloadLinks({});
-    setAbi(null);
-    setBytecode("");
     setContractAddress(null);
+    setVerifierSol("");
 
     try {
       const res = await fetch("/api/compile-circuit", {
@@ -39,7 +37,6 @@ export default function Home() {
       }
 
       const data = await res.json();
-      console.log("Compile response:", data);
 
       const createDownload = (base64: string, filename: string, mime: string) => {
         const blob = new Blob([Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))], {
@@ -54,14 +51,8 @@ export default function Home() {
         verifier: URL.createObjectURL(new Blob([data.verifier], { type: "text/plain" })),
       });
 
-      if (data.abi && data.bytecode) {
-        console.log("Received ABI:", data.abi);
-        console.log("Received Bytecode length:", data.bytecode.length);
-        setAbi(data.abi);
-        setBytecode(data.bytecode);
-      } else {
-        alert("ABI and bytecode not received from backend. Deploy disabled.");
-      }
+      // Save verifier.sol source to state for deployment
+      setVerifierSol(data.verifier);
 
       setCompiling(false);
     } catch (err) {
@@ -72,69 +63,39 @@ export default function Home() {
   };
 
   const handleDeploy = async () => {
-  if (!abi || !bytecode) {
-    alert("Missing ABI or bytecode for deployment.");
-    return;
-  }
-
-  if (!(window as any).ethereum) {
-    alert("Please install a web3 wallet like MetaMask or Talisman.");
-    return;
-  }
-
-  try {
-    setDeploying(true);
-    const web3 = new Web3((window as any).ethereum);
-    await (window as any).ethereum.request({ method: "eth_requestAccounts" });
-    const accounts = await web3.eth.getAccounts();
-    const account = accounts[0];
-
-    console.log("Deploying from account:", account);
-    console.log("ABI:", abi);
-    console.log("Bytecode (first 100 chars):", bytecode.slice(0, 100));
-
-    const contract = new web3.eth.Contract(abi);
-    const deployTx = contract.deploy({ data: bytecode });
-
-    let gasEstimate;
-    try {
-      gasEstimate = await deployTx.estimateGas({ from: account });
-      console.log("Estimated Gas (raw):", gasEstimate, typeof gasEstimate);
-
-      // Convert BigInt (or any other type) to string explicitly
-      const gasEstimateStr = gasEstimate.toString();
-      console.log("Estimated Gas (string):", gasEstimateStr, typeof gasEstimateStr);
-
-      // Add buffer gas as a Number, convert sum back to string
-      // const gasWithBuffer = (BigInt(gasEstimateStr) + BigInt(100000)).toString();
-      const gasWithBuffer = (BigInt(gasEstimateStr)).toString();
-
-      console.log("Gas with buffer (string):", gasWithBuffer);
-
-      // Use gasWithBuffer string in deployment
-      const deployedContract = await deployTx.send({
-        from: account,
-        gas: gasWithBuffer,
-      });
-
-      // After deployment
-      setContractAddress(deployedContract.options.address || null);
-
-      alert("Contract deployed at: " + deployedContract.options.address);
-    } catch (gasErr) {
-      console.error("Gas estimation or deployment error:", gasErr);
-      alert("Gas estimation or deployment failed. See console.");
-      setDeploying(false);
+    if (!verifierSol) {
+      alert("No verifier.sol code to deploy. Please compile first.");
       return;
     }
-  } catch (err: any) {
-    console.error("Unexpected deployment error:", err);
-    alert("Deployment failed: " + (err.message || err));
-  } finally {
-    setDeploying(false);
-  }
-};
 
+    setDeploying(true);
+    setContractAddress(null);
+
+    try {
+      const res = await fetch("/api/deploy-verifier", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ verifier: verifierSol }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        alert("Deployment failed: " + (err.details || "Unknown error"));
+        setDeploying(false);
+        return;
+      }
+
+      const data = await res.json();
+
+      setContractAddress(data.contractAddress || null);
+      alert("Contract deployed at: " + data.contractAddress);
+    } catch (err) {
+      console.error("Deploy error:", err);
+      alert("Deployment error occurred. Check console.");
+    } finally {
+      setDeploying(false);
+    }
+  };
 
   return (
     <main className="min-h-screen p-6 bg-gray-100">
@@ -183,7 +144,7 @@ export default function Home() {
 
             <button
               onClick={handleDeploy}
-              disabled={deploying || !abi || !bytecode}
+              disabled={deploying || !verifierSol}
               className="mt-4 px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
             >
               {deploying ? "Deploying..." : "Deploy Contract"}
