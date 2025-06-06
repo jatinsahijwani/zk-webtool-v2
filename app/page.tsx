@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { Button } from "@/components/ui/button"
+import {Shield} from "lucide-react"
 
 export default function Home() {
   const [circuitCode, setCircuitCode] = useState("");
@@ -98,21 +100,44 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen p-6 bg-gray-100">
-      <div className="max-w-3xl mx-auto bg-white p-6 rounded-xl shadow">
-        <h1 className="text-2xl text-black font-semibold mb-4">ZK Circuit Compiler</h1>
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-pink-900 to-purple-900">
+      {/* Navigation */}
+      <nav className="border-b border-white/10 bg-black/20 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-2">
+              <div className="relative">
+                <Shield className="h-8 w-8 text-pink-400" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-pink-500 rounded-full animate-pulse"></div>
+              </div>
+              <span className="text-xl font-bold text-white">Polka</span>
+              <span className="text-xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
+                ZK
+              </span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button variant="ghost" className="text-white hover:text-pink-400">
+                Docs
+              </Button>
+              <Button className="bg-pink-600 hover:bg-pink-700 text-white">GitHub</Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+      <div className="max-w-3xl mx-auto bg-white/30 p-6 rounded-xl shadow mt-8">
+        <h1 className="text-2xl text-white font-semibold mb-4">ZK Circuit Compiler</h1>
 
         <textarea
           value={circuitCode}
           onChange={(e) => setCircuitCode(e.target.value)}
           placeholder="Enter your Circom circuit here..."
-          className="w-full h-60 p-4 border border-gray-300 text-black rounded mb-4 font-mono"
+          className="w-full h-60 p-4 border border-white text-white rounded mb-4 font-mono"
         />
 
         <button
           onClick={handleCompile}
           disabled={compiling || !circuitCode.trim()}
-          className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          className="px-6 py-2 bg-blue-800 text-white rounded hover:bg-blue-900 "
         >
           {compiling ? "Compiling..." : "Compile Circuit"}
         </button>
