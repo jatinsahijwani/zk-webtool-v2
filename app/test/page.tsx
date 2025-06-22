@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button"
 import {Shield} from "lucide-react"
+import { DownloadFileButton } from "@/components/ui/download-file-button"
 
 export default function Home() {
   const [circuitCode, setCircuitCode] = useState("");
@@ -124,7 +125,7 @@ export default function Home() {
           </div>
         </div>
       </nav>
-      <div className="max-w-3xl mx-auto bg-white/30 p-6 rounded-xl shadow mt-8">
+      <div className="max-w-3xl mx-auto bg-white/30 p-6 rounded-xl shadow mt-8 ">
         <h1 className="text-2xl text-white font-semibold mb-4">ZK Circuit Compiler</h1>
 
         <textarea
@@ -144,40 +145,53 @@ export default function Home() {
 
         {downloadLinks.verifier && (
           <div className="mt-6 space-y-3">
-            <h2 className="text-lg text-black font-medium">Download Compiled Files:</h2>
+            <h2 className="text-lg text-white font-extrabold">Download Compiled Files:</h2>
+            <div className="flex gap-2">
             <a
               href={downloadLinks.verifier}
               download="verifier.sol"
-              className="text-blue-600 underline block"
+              className="text-black font-bold block"
             >
+              <DownloadFileButton className="w-[8vw] "
+          fileName="Verifier.sol"
+          label=" Verifier.sol ">
               Download verifier.sol
+              </DownloadFileButton>
             </a>
+            
             <a
               href={downloadLinks.wasm}
               download="circuit.wasm"
-              className="text-blue-600 underline block"
+              className="text-black font-bold block"
             >
+              <DownloadFileButton className="w-[8vw] " fileName="circuit.wasm" label="circuit.wasm">
               Download circuit.wasm
+              </DownloadFileButton>
             </a>
             <a
               href={downloadLinks.zkey}
               download="circuit_final.zkey"
-              className="text-blue-600 underline block"
+              className="text-black font-bold block"
             >
+              <DownloadFileButton className="w-[8vw] " fileName="
+              Download circuit_final.zkey" label="
+              circuit_final.zkey">
               Download circuit_final.zkey
+              </DownloadFileButton>
             </a>
+            </div>
 
             <button
               onClick={handleDeploy}
               disabled={deploying || !verifierSol}
-              className="mt-4 px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+              className="mt-4 px-6 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 disabled:opacity-50"
             >
               {deploying ? "Deploying..." : "Deploy Contract"}
             </button>
 
             {contractAddress && (
-              <p className="mt-2 text-green-800">
-                Deployed Contract Address: <code>{contractAddress}</code>
+              <p className="mt-2 text-white font-bold ">
+               <p className="text-gray-300">Deployed Contract Address: </p>  <code>{contractAddress}</code>
               </p>
             )}
           </div>

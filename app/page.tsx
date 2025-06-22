@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ArrowRight,
   Code,
@@ -12,11 +14,13 @@ import {
   Layers,
   Users,
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
 export default function HomePage() {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-pink-900 to-purple-900">
       {/* Navigation */}
@@ -37,7 +41,9 @@ export default function HomePage() {
               <Button variant="ghost" className="text-white hover:text-pink-400">
                 Docs
               </Button>
-              <Button className="bg-pink-600 hover:bg-pink-700 text-white"> 
+              <Button onClick={() => {
+                router.push("/test")
+              }} className="bg-pink-600 hover:bg-pink-700 text-white"> 
                 Get Started</Button>
             </div>
           </div>
@@ -65,7 +71,9 @@ export default function HomePage() {
             Circom circuits and deploy directly to PolkaVM—no complex setup, no barriers to entry.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-4 text-lg">
+            <Button onClick={() => {
+              router.push("/test")
+            }} size="lg" className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-4 text-lg">
               Get Started <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
